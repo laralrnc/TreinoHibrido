@@ -50,6 +50,7 @@ ol.stp{margin:4px 0 4px;padding-left:20px;color:var(--mut);font-size:14px}
 .ft button{background:none;border:1px solid var(--line);color:var(--mut);border-radius:8px;padding:8px 12px;font:inherit;cursor:pointer}
 .note{font-size:13px;color:var(--mut);margin-top:16px}
 .nt{width:100%;margin-top:8px;padding:8px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);font:inherit;font-size:14px;resize:vertical}
+.gh{font-weight:600;color:var(--mut);padding:10px 2px 0;font-size:14px}.wb{height:12px;background:var(--line);border-radius:6px;overflow:hidden;margin:8px 0}.wb i{display:block;height:100%;background:var(--ok)}.dn{display:flex;gap:8px;align-items:center;justify-content:space-between;margin:8px 0}.bt{min-height:44px;min-width:44px;padding:8px 14px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--ink);font:inherit;cursor:pointer}
 button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:3px solid var(--run);outline-offset:2px}
 </style></head><body><div class="w">
 <h1>Time Híbrido</h1>
@@ -114,7 +115,7 @@ function week(w){
 let S={d:{},k:{},st:''};
 try{Object.assign(S,JSON.parse(localStorage.getItem('th2o')||'{}'))}catch(e){}
 Object.keys(S.k).forEach(k=>{if(!k.includes(':')){S.k[k+':0']=S.k[k];delete S.k[k]}});
-S.n=S.n||{};
+S.n=S.n||{};S.di=S.di||{};
 const esc=t=>String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;');
 const save=()=>{try{localStorage.setItem('th2o',JSON.stringify(S))}catch(e){}};
 const $=s=>document.querySelector(s);
@@ -152,6 +153,29 @@ function runC(){
  const tp=P.reduce((a,b)=>a+b,0),td=Dn.reduce((a,b)=>a+b,0);
  return`<div class="day"><div class="dh"><span>Corrida · minutos em ritmo moderado (Z3)</span><small>${td} de ${tp} min</small></div><svg class="ch" viewBox="0 0 640 230" role="img" aria-label="Minutos em Z3 por semana, feito e planejado">${g}</svg><div class="note">Soma os tiros em Z3 e os minutos contínuos de cada semana. A prova de 5 km da semana 12 fica de fora.</div></div>`}
 function evo(){return evoS()+runC()}
+const AL='Salada e legumes à vontade, inclua pelo menos 2 opções (temperar com vinagre, limão, azeite extravirgem)';
+const PR='Carne magra ou Frango (peito ou filé) ou Peixe (tilápia, merluza, salmão, saint peter) (1 filé médio ~120g) ou Omelete com queijo (150g). Preparo: cozido, grelhado ou assado.';
+const FR='Fruta (1 porção ~100g) + Aveia ou Chia ou Linhaça (1 colher de sopa ~15g)';
+const MEALS=[
+{id:'cm',t:'Café da manhã',h:'06:00',g:[['Opção 1',[['Carboidratos','Pão integral com sementes e grãos/Pão sírio (1-2 fatias ~40g) ou Crepioca/Tapioca/Cuscuz (1 unidade ~70-80g) ou Pão de queijo de frigideira (1 unidade média ~80g)'],['Proteínas','Ovos mexidos ou cozidos (1 unidade ~50g) + Queijo branco (ricota, minas frescal) (1 fatia média ~30-40g) ou Frango desfiado ou Patê de atum/frango com creme de ricota, cottage ou requeijão light (4 colheres de sopa ~40g)'],['Frutas',FR]]],['Opção 2 · iogurte com fruta ou overnight com geleia de fruta natural',[['Frutas',FR],['Produtos lácteos','Iogurte natural ou grego (1 unidade ~120-170g) ou Bebida láctea proteica, acima de 20 g de proteína (1 unidade ~200ml)']]]]},
+{id:'al',t:'Almoço',h:'12:00',g:[['',[['Carboidratos','Arroz branco ou integral (4 colheres de sopa ~80g) ou Purê de batata doce/aipim (3 colheres de sopa cheias ~100g) ou Macarrão integral ao molho bolonhesa natural (1 e ½ pegador ~105g)'],['Leguminosas','Feijão ou Grão-de-bico ou Ervilha ou Lentilha (1 concha média 65g). Deixe de molho por ~8–12 horas, descarte a água e cozinhe com água nova.'],['Proteínas',PR],['Verduras e legumes',AL]]]]},
+{id:'la',t:'Lanche da tarde',h:'16:30',g:[['Pode usar as mesmas opções do café da manhã, variando e mantendo o equilíbrio. Opção prática: iogurte + fruta + fibra + 1 porção de oleaginosas (castanhas) ou bebida láctea proteica + fruta.',[['Fruta','Sempre adicionar uma porção de fruta'],['Fonte de proteína','Sempre adicionar uma fonte de proteína']]]]},
+{id:'ja',t:'Jantar',h:'19:30–20:30',g:[['Opção 1',[['Proteínas',PR],['Verduras e legumes',AL],['Carboidratos do almoço','Opcional']]],['Opção 2 · preparações mais leves',[['Preparação leve','Lanches naturais, sopas ou caldos nutritivos. Outra opção: hambúrguer caseiro, wrap integral, crepioca recheada ou escondidinho de sua preferência']]]]}];
+const iso=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+let dd=iso(new Date());
+const gd=()=>S.di[dd]=S.di[dd]||{c:{},f:{},n:{},w:0};
+function dieta(){
+ const D=S.di[dd]||{},C=D.c||{},F=D.f||{},N=D.n||{},wn=D.w||0,mo=dd.slice(0,7);
+ let fr=0;for(const k in S.di)if(k.startsWith(mo))for(const x in (S.di[k].f||{}))if(S.di[k].f[x])fr++;
+ const L=wn*.25,dt=new Date(dd+'T00:00:00').toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long'});
+ let h=`<h2>Dieta</h2><div class="dn"><button class="bt" data-dd="-1" aria-label="Dia anterior">‹</button><div class="dh" style="padding:0"><span>${dt}</span></div><button class="bt" data-dd="1" aria-label="Próximo dia">›</button></div><div class="dn"><button class="bt" data-dd="0">Hoje</button></div>`;
+ h+=`<div class="c pre"><h3>Água · meta de 2 a 2,5 litros por dia</h3><div class="note" style="margin:0">Nos intervalos das refeições e durante a atividade física.</div><div class="wb"><i style="width:${Math.min(100,L/2.5*100)}%"></i></div><div class="dn"><span class="dl">${String(L).replace('.',',')} L</span><span><button class="bt" data-wt="-1">−250 ml</button> <button class="bt" data-wt="1">+250 ml</button></span></div></div>`;
+ MEALS.forEach(m=>{
+  h+=`<div class="c abs"><h3>${m.h} · ${m.t}</h3><label class="u"><input type="checkbox" data-df="${m.id}" ${F[m.id]?'checked':''}><span class="nm">Refeição livre<small>${fr} de 4 neste mês</small></span></label>`;
+  m.g.forEach((g,gi)=>{if(g[0])h+=`<div class="gh">${g[0]}</div>`;g[1].forEach((it,ii)=>{const id=m.id+gi+ii;h+=`<label class="u"><input type="checkbox" data-di="${id}" ${C[id]?'checked':''}><span class="nm"><b>${it[0]}</b><small>${it[1]}</small></span></label>`})});
+  h+=`<textarea class="nt" rows="2" data-dn="${m.id}" placeholder="O que comeu? Trocas, observações" aria-label="Anotação da refeição">${esc(N[m.id]||'')}</textarea></div>`});
+ return h+`<div class="note">Refeição livre: 4 por mês, para alimentos de que você gosta muito, como pastel, pizza (até 2 pedaços), churrasco ou doce. Depois, retome o planejamento.</div>`;
+}
 function csv(){
  const q=v=>'"'+String(v).replace(/"/g,'""')+'"',R=[['semana','dia','sessão','item','feito','carga_kg','anotação'].map(q).join(';')];
  for(let w=1;w<=12;w++)week(w).forEach((ss,d)=>ss.forEach(s=>{
@@ -159,6 +183,12 @@ function csv(){
    if(u.k==='s')u.n.forEach((nm,i)=>{const kg=S.k[u.id+':'+i]||'';if(f||kg)R.push([w,DN[d],s.t,nm,f+'/'+u.m,kg,''].map(q).join(';'))});
    else if(f)R.push([w,DN[d],s.t,u.l,f+'/'+u.m,'',''].map(q).join(';'))});
   const nt=S.n[s.u[0].id];if(nt)R.push([w,DN[d],s.t,'(anotação)','','',nt].map(q).join(';'))}));
+ Object.keys(S.di).sort().forEach(k=>{const D=S.di[k];
+  MEALS.forEach(m=>{const t='Dieta · '+m.t;
+   if((D.f||{})[m.id])R.push(['',k,t,'Refeição livre','1','',''].map(q).join(';'));
+   m.g.forEach((g,gi)=>g[1].forEach((it,ii)=>{if((D.c||{})[m.id+gi+ii])R.push(['',k,t,it[0]+(g[0]&&g[0].length<40?' ('+g[0]+')':''),'1','',''].map(q).join(';'))}));
+   if((D.n||{})[m.id])R.push(['',k,t,'(anotação)','','',D.n[m.id]].map(q).join(';'))});
+  if(D.w)R.push(['',k,'Dieta · Água','Litros','','',String(D.w*.25).replace('.',',')].map(q).join(';'))});
  return R.join('\n')}
 function exp(){return`<h2>Exportar histórico</h2><div class="sub">Copie o texto e cole numa planilha ou nas suas notas. Os campos são separados por ponto e vírgula.</div><textarea class="nt" id="cv" rows="12" readonly>${esc(csv())}</textarea><button class="go" data-cp>Copiar histórico</button><div id="cpm" class="note" role="status"></div>`}
 function render(){
@@ -166,8 +196,8 @@ function render(){
  let all=0,dn=0;for(let i=1;i<=12;i++){const [a,b]=tally(week(i).flat());dn+=a;all+=b}
  $('#pb').style.width=(100*dn/all)+'%';$('#pt').textContent=Math.round(100*dn/all)+'% do plano concluído';
  $('#st').value=S.st||'';
- $('#tabs').innerHTML=Array.from({length:12},(_,i)=>{const [a,b]=tally(week(i+1).flat());return`<button class="${i+1===w&&view==='w'?'on':''} ${a===b?'fin':''}" data-w="${i+1}" aria-label="Semana ${i+1}">${i+1}</button>`}).join('')+`<button class="${view==='e'?'on':''}" data-e="1" style="padding:0 14px">Evolução</button><button class="${view==='x'?'on':''}" data-x="1" style="padding:0 14px">Exportar</button>`;
- if(view==='e'||view==='x'){$('#main').innerHTML=view==='e'?evo():exp();return}
+ $('#tabs').innerHTML=Array.from({length:12},(_,i)=>{const [a,b]=tally(week(i+1).flat());return`<button class="${i+1===w&&view==='w'?'on':''} ${a===b?'fin':''}" data-w="${i+1}" aria-label="Semana ${i+1}">${i+1}</button>`}).join('')+`<button class="${view==='e'?'on':''}" data-e="1" style="padding:0 14px">Evolução</button><button class="${view==='d'?'on':''}" data-d="1" style="padding:0 14px">Dieta</button><button class="${view==='x'?'on':''}" data-x="1" style="padding:0 14px">Exportar</button>`;
+ if(view!=='w'){$('#main').innerHTML=view==='e'?evo():view==='x'?exp():dieta();return}
  const [wa,wt]=tally(wk.flat());
  let h=`<h2>Semana ${w} · ${PH[ph(w)]}</h2><div class="sub">${Math.round(100*wa/wt)}% da semana</div>`;
  wk.forEach((ss,d)=>{
@@ -184,7 +214,10 @@ function render(){
 }
 document.addEventListener('click',e=>{
  const t=e.target.closest('button');if(!t)return;
- if(t.dataset.e){view='e';render();scrollTo(0,0)}
+ if(t.dataset.d){view='d';render();scrollTo(0,0)}
+ else if(t.dataset.dd!==undefined){const x=+t.dataset.dd,d=x?new Date(dd+'T00:00:00'):new Date();if(x)d.setDate(d.getDate()+x);dd=iso(d);render()}
+ else if(t.dataset.wt){const D=gd();D.w=Math.max(0,(D.w||0)+ +t.dataset.wt);save();render()}
+ else if(t.dataset.e){view='e';render();scrollTo(0,0)}
  else if(t.dataset.x){view='x';render();scrollTo(0,0)}
  else if(t.dataset.w){cur=+t.dataset.w;view='w';render();scrollTo(0,0)}
  else if(t.dataset.s){const id=t.dataset.s,j=+t.dataset.j;S.d[id]=S.d[id]===j?j-1:j;save();render()}
@@ -192,15 +225,18 @@ document.addEventListener('click',e=>{
  else if('cp' in t.dataset){const a=$('#cv');a.select();let ok=false;try{ok=document.execCommand('copy')}catch(e){}try{navigator.clipboard.writeText(a.value);ok=true}catch(e){}$('#cpm').textContent=ok?'Copiado!':'Não consegui copiar sozinha. O texto está selecionado, use o copiar do seu aparelho.'}
  else if('hiit' in t.dataset)startT();
  else if(t.id==='tx')stopT();
- else if(t.id==='rs'){if(t.dataset.a){S.d={};S.k={};S.n={};save();t.textContent='Limpar progresso';delete t.dataset.a;render()}else{t.dataset.a=1;t.textContent='Toque de novo para confirmar';setTimeout(()=>{delete t.dataset.a;t.textContent='Limpar progresso'},4000)}}
+ else if(t.id==='rs'){if(t.dataset.a){S.d={};S.k={};S.n={};S.di={};save();t.textContent='Limpar progresso';delete t.dataset.a;render()}else{t.dataset.a=1;t.textContent='Toque de novo para confirmar';setTimeout(()=>{delete t.dataset.a;t.textContent='Limpar progresso'},4000)}}
 });
 document.addEventListener('change',e=>{
  if(e.target.dataset.i){S.d[e.target.dataset.i]=e.target.checked?1:0;save();render()}
+ if(e.target.dataset.di){gd().c[e.target.dataset.di]=e.target.checked?1:0;save()}
+ if(e.target.dataset.df){gd().f[e.target.dataset.df]=e.target.checked?1:0;save();render()}
  if(e.target.id==='ex'){ex=e.target.value;render()}
  if(e.target.id==='st'){S.st=e.target.value;save();const p=pos();if(p)cur=p.w;render()}
 });
 document.addEventListener('input',e=>{if(e.target.dataset.k){S.k[e.target.dataset.k]=e.target.value;save()}
- if(e.target.dataset.n){S.n[e.target.dataset.n]=e.target.value;save()}});
+ if(e.target.dataset.n){S.n[e.target.dataset.n]=e.target.value;save()}
+ if(e.target.dataset.dn){gd().n[e.target.dataset.dn]=e.target.value;save()}});
 let tm=null,ac=null;
 function beep(){try{ac=ac||new AudioContext();const o=ac.createOscillator();o.connect(ac.destination);o.frequency.value=880;o.start();o.stop(ac.currentTime+.2)}catch(e){}try{navigator.vibrate&&navigator.vibrate(200)}catch(e){}}
 function stopT(){clearInterval(tm);tm=null;$('#tp').hidden=true}
