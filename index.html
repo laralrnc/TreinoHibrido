@@ -59,7 +59,7 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-vis
 <label class="st">Início da semana 1 (segunda): <input type="date" id="st"></label>
 <nav id="tabs" aria-label="Semanas"></nav>
 <main id="main"></main>
-<p class="note">Corridas: o aquecimento (mobilidade + estabilidade leve) vem antes e o fortalecimento do protocolo Zero Canelite vem depois, como o PDF recomenda. Os dias de musculação não vêm no PDF, então sugeri: seg A, ter corrida + HIIT, qua B, qui corrida, sex D, sáb corrida. Siga a ordem que sua consultoria indicar.</p>
+<p class="note">Corridas: o aquecimento (mobilidade + estabilidade leve) vem antes e o fortalecimento do protocolo Zero Canelite vem depois, como o PDF recomenda. Os dias de musculação não vêm no PDF, então sugeri: seg B (inferiores), ter corrida + HIIT, qua A (superiores), qui corrida, sex D (inferiores), sáb corrida e dom descanso. O fortalecimento depois da corrida fica na quinta e no sábado. Siga a ordem que sua consultoria indicar.</p>
 <div class="ft"><button id="rs">Limpar progresso</button></div>
 </div>
 <div id="tp" hidden><span id="tt"></span><button id="tx">Parar</button></div>
@@ -101,12 +101,12 @@ function runS(w,x,id){
 function hiit(w,id){const n=w<7?2:3;return{t:'Treino C · HIIT abdominal',g:'abs',h:1,u:Array.from({length:n},(_,i)=>({id:id+'r'+i,k:'c',m:1,l:'Rodada '+(i+1)+' de '+n+' (8 × 20 s)'}))}}
 function week(w){
  const p=ph(w),r=RUN[w],id=(d,s)=>w+'-'+d+'-'+s+'-';
- const RD=(w,x,d)=>[pv(id(d,2),PRET,PRE),runS(w,x,id(d,0)),pv(id(d,3),POST,POS)];
+ const RD=(w,x,d,f=1)=>[pv(id(d,2),PRET,PRE),runS(w,x,id(d,0)),...(f?[pv(id(d,3),POST,POS)]:[])];
  const up='Aquecimento e mobilidade de superiores',lw='Mobilidade inferiores + 3×15 agachamento com peso do corpo';
  const Bb=B[p].map(b=>b.slice());if(w===5)Bb[3][0]='d';
- return[[strS(w,id(0,0),'Treino A · Superiores completo',A[p],up)],
- [...RD(w,r[0],1),hiit(w,id(1,1))],
- [strS(w,id(2,0),'Treino B · Membros inferiores',Bb,lw)],
+ return[[strS(w,id(2,0),'Treino B · Membros inferiores',Bb,lw)],
+ [...RD(w,r[0],1,0),hiit(w,id(1,1))],
+ [strS(w,id(0,0),'Treino A · Superiores completo',A[p],up)],
  r[1]?RD(w,r[1],3):[],
  [strS(w,id(4,0),'Treino D · Membros inferiores',D[p],lw)],
  w<12?RD(w,r[2],5):[],
@@ -125,7 +125,7 @@ let cur=(pos()||{w:1}).w;
 function uh(u){
  const v=S.d[u.id]||0;
  if(u.k==='c')return`<label class="u"><input type="checkbox" data-i="${u.id}" ${v?'checked':''}><span class="nm">${u.l}</span></label>`;
- if(u.k==='n')return`<div class="u"><div class="nm"><b>${u.l}</b></div><div class="cnt"><button aria-label="menos" data-c="${u.id}" data-x="-1" data-m="${u.m}">−</button><span>${v}/${u.m}</span><button aria-label="mais" data-c="${u.id}" data-x="1" data-m="${u.m}">+</button></div></div>`;
+ if(u.k==='n')return`<div class="u"><div class="nm"><b>${u.l}</b></div><div class="cnt"><button aria-label="menos" data-c="${u.id}" data-dx="-1" data-m="${u.m}">−</button><span>${v}/${u.m}</span><button aria-label="mais" data-c="${u.id}" data-dx="1" data-m="${u.m}">+</button></div></div>`;
  return`<div class="u"><div class="nm"><b>${u.n.join(' + ')}</b><small>${u.ty} · 3×${u.r}</small></div><div class="dots">${[1,2,3].map(j=>`<button class="dot ${v>=j?'on':''}" aria-label="série ${j}" data-s="${u.id}" data-j="${j}">${j}</button>`).join('')}</div><div class="kgs">${u.n.map((x,i)=>`<input class="kg" inputmode="decimal" placeholder="kg" aria-label="carga em kg: ${x}" data-k="${u.id}:${i}" value="${S.k[u.id+':'+i]||''}">`).join('')}</div></div>`;
 }
 let view='w',ex='';
@@ -221,7 +221,7 @@ document.addEventListener('click',e=>{
  else if(t.dataset.x){view='x';render();scrollTo(0,0)}
  else if(t.dataset.w){cur=+t.dataset.w;view='w';render();scrollTo(0,0)}
  else if(t.dataset.s){const id=t.dataset.s,j=+t.dataset.j;S.d[id]=S.d[id]===j?j-1:j;save();render()}
- else if(t.dataset.c){const id=t.dataset.c,m=+t.dataset.m;S.d[id]=Math.max(0,Math.min(m,(S.d[id]||0)+ +t.dataset.x));save();render()}
+ else if(t.dataset.c){const id=t.dataset.c,m=+t.dataset.m;S.d[id]=Math.max(0,Math.min(m,(S.d[id]||0)+ +t.dataset.dx));save();render()}
  else if('cp' in t.dataset){const a=$('#cv');a.select();let ok=false;try{ok=document.execCommand('copy')}catch(e){}try{navigator.clipboard.writeText(a.value);ok=true}catch(e){}$('#cpm').textContent=ok?'Copiado!':'Não consegui copiar sozinha. O texto está selecionado, use o copiar do seu aparelho.'}
  else if('hiit' in t.dataset)startT();
  else if(t.id==='tx')stopT();
