@@ -59,7 +59,7 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-vis
 <label class="st">Início da semana 1 (segunda): <input type="date" id="st"></label>
 <nav id="tabs" aria-label="Semanas"></nav>
 <main id="main"></main>
-<p class="note">Corridas: o aquecimento (mobilidade + estabilidade leve) vem antes e o fortalecimento do protocolo Zero Canelite vem depois, como o PDF recomenda. Os dias de musculação não vêm no PDF, então sugeri: seg B (inferiores), ter corrida + HIIT, qua A (superiores), qui corrida, sex D (inferiores), sáb corrida e dom descanso. O fortalecimento depois da corrida fica na quinta e no sábado. Siga a ordem que sua consultoria indicar.</p>
+<p class="note">Corridas: o aquecimento (mobilidade + estabilidade leve) vem antes e o fortalecimento do protocolo Zero Canelite vem depois, como o PDF recomenda. Os dias de musculação não vêm no PDF, então sugeri: seg descanso, ter corrida + HIIT, qua B (inferiores), qui corrida + A (superiores), sex descanso, sáb corrida mais longa e dom D (inferiores). Na semana 12 a prova é no domingo, então os treinos de força vêm antes. O fortalecimento depois da corrida fica na quinta e no sábado. Siga a ordem que sua consultoria indicar.</p>
 <div class="ft"><button id="rs">Limpar progresso</button></div>
 </div>
 <div id="tp" hidden><span id="tt"></span><button id="tx">Parar</button></div>
@@ -104,13 +104,9 @@ function week(w){
  const RD=(w,x,d,f=1)=>[pv(id(d,2),PRET,PRE),runS(w,x,id(d,0)),...(f?[pv(id(d,3),POST,POS)]:[])];
  const up='Aquecimento e mobilidade de superiores',lw='Mobilidade inferiores + 3×15 agachamento com peso do corpo';
  const Bb=B[p].map(b=>b.slice());if(w===5)Bb[3][0]='d';
- return[[strS(w,id(2,0),'Treino B · Membros inferiores',Bb,lw)],
- [...RD(w,r[0],1,0),hiit(w,id(1,1))],
- [strS(w,id(0,0),'Treino A · Superiores completo',A[p],up)],
- r[1]?RD(w,r[1],3):[],
- [strS(w,id(4,0),'Treino D · Membros inferiores',D[p],lw)],
- w<12?RD(w,r[2],5):[],
- w===12?RD(w,r[2],6):[]];
+ const B_=()=>strS(w,id(2,0),'Treino B · Membros inferiores',Bb,lw),A_=()=>strS(w,id(0,0),'Treino A · Superiores completo',A[p],up),D_=()=>strS(w,id(4,0),'Treino D · Membros inferiores',D[p],lw),H=[...RD(w,r[0],1,0),hiit(w,id(1,1))];
+ if(w===12)return[[D_()],H,[A_()],[B_()],[],[],RD(w,r[2],6)];
+ return[[],H,[B_()],[...(r[1]?RD(w,r[1],3):[]),A_()],[],RD(w,r[2],5),[D_()]];
 }
 let S={d:{},k:{},st:''};
 try{Object.assign(S,JSON.parse(localStorage.getItem('th2o')||'{}'))}catch(e){}
