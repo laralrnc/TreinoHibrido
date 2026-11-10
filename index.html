@@ -53,101 +53,128 @@ ol.stp{margin:4px 0 4px;padding-left:20px;color:var(--mut);font-size:14px}
 .gh{font-weight:600;color:var(--mut);padding:10px 2px 0;font-size:14px}.wb{height:12px;background:var(--line);border-radius:6px;overflow:hidden;margin:8px 0}.wb i{display:block;height:100%;background:var(--ok)}.dn{display:flex;gap:8px;align-items:center;justify-content:space-between;margin:8px 0}.bt{min-height:44px;min-width:44px;padding:8px 14px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--ink);font:inherit;cursor:pointer}
 button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:3px solid var(--run);outline-offset:2px}
 </style></head><body><div class="w">
-<h1>Time Híbrido</h1>
-<p class="sub">12 semanas · corrida 5 km + musculação 4x</p>
+<h1>Meu plano</h1>
+<p class="sub">23 semanas · corrida até os 10 km + musculação 3x</p>
 <div class="bar"><i id="pb"></i></div><div id="pt"></div>
-<label class="st">Início da semana 1 (segunda): <input type="date" id="st"></label>
+<label class="st">Início da semana 2 (segunda): <input type="date" id="st"></label>
 <nav id="tabs" aria-label="Semanas"></nav>
 <main id="main"></main>
-<p class="note">Corridas: o aquecimento (mobilidade + estabilidade leve) vem antes e o fortalecimento do protocolo Zero Canelite vem depois, como o PDF recomenda. Os dias de musculação não vêm no PDF, então sugeri: seg B (inferiores), ter corrida curta + A (superiores) + HIIT abdominal, qua descanso, qui corrida, sex D (inferiores), sáb corrida mais longa e dom descanso. Na semana 12 a prova é no domingo, então os treinos de inferiores vêm antes (D na segunda e B na quinta). O fortalecimento depois da corrida fica na quinta e no sábado. Siga a ordem que sua consultoria indicar.</p>
+<p class="note">Segunda inferiores, terça corrida de qualidade (tiro, fartlek, ritmo ou progressivo) + core, quarta superiores, quinta rodagem leve + glúteo e posterior, sexta descanso, sábado pilates + longão, domingo descanso. Semana 12: prova ou teste de 5 km. Semana 24: prova de 10 km. Nas semanas leves (4, 8, 13, 17, 21 e 23) mantenha o ritmo mais tranquilo. Se uma semana ficar difícil, repita-a antes de avançar. É uma sugestão e não substitui a orientação de um profissional.</p>
 <div class="ft"><button id="rs">Limpar progresso</button></div>
 </div>
 <div id="tp" hidden><span id="tt"></span><button id="tx">Parar</button></div>
 <script>
-const T={b:'Bi-set',m:'Meta de repetição',d:'Drop-set',p:'Pirâmide'};
-const RP=[0,15,12,10,15,12,10,8,12,10,10,8,15];
-const A=[0,
-[['b','Crucifixo reto','Elevação lateral'],['m','Remada baixa'],['b','Puxada alta','Elevação frontal'],['m','Desenvolvimento Arnold']],
-[['b','Supino reto','Elevação frontal'],['b','Crucifixo reto','Elevação lateral'],['b','Puxada alta','Elevação frontal'],['d','Remada supinada']],
-[['b','Supino reto','Elevação frontal'],['m','Bíceps martelo'],['m','Puxada alta graviton'],['m','Tríceps testa']]];
-const B=[0,
-[['m','Agachamento hack'],['m','Cadeira extensora'],['m','Mesa flexora'],['m','Leg press 45'],['b','Cadeira abdutora','Panturrilha em pé']],
-[['m','Agachamento hack'],['m','Cadeira extensora','Agachamento frontal c/ halteres'],['m','Leg press 45'],['m','Cadeira flexora'],['b','Recuo alternado','Elevação pélvica']],
-[['m','Cadeira extensora','Agachamento frontal c/ halteres'],['m','Agachamento livre'],['p','Leg press 45'],['d','Cadeira flexora'],['b','Cadeira abdutora','Agachamento sumô']]];
-const D=[0,
-[['m','Agachamento sumô'],['m','Elevação pélvica'],['m','Cadeira abdutora'],['m','Cadeira flexora']],
-[['m','Recuo alternado (cada perna)'],['m','Elevação pélvica'],['m','Cadeira abdutora'],['b','Mesa flexora','Panturrilha em pé']],
-[['m','Recuo alternado (cada perna)'],['d','Cadeira flexora'],['b','Cadeira abdutora','Agachamento sumô'],['b','Mesa flexora','Panturrilha em pé']]];
-const PRET='Antes de correr · mobilidade + estabilidade leve',POST='Depois de correr · fortalecimento (1 min entre séries)';
-const PRE=[['Mobilidade de tornozelo na parede','2×20 por perna'],['Círculo de quadril (standing hip CARS)','2×5 voltas por perna'],['Flexão plantar e dorsal (elástico ou solo)','2×20 cada'],['Alongamento dinâmico do flexor do quadril','2×20 por perna'],['Foot tripod (arco do pé)','2×30 s por perna'],['Equilíbrio unilateral com alcance','2×10 por perna'],['Clamshell (ostra) com miniband','2×15 por perna']];
-const POS=[['Marcha com calcanhar (tibial walks)','3×20 passos por perna'],['Flexão tibial anterior com miniband','3×15 por perna'],['Elevação de panturrilha unilateral','3×15 por perna'],['Tibial posterior: inversão sentado com miniband','3×15 por perna'],['Tibial posterior: eversão sentado com miniband','3×3 voltas'],['Flexão plantar com meio agachamento isométrico','2×10 por perna'],['Puxar toalha com os pés sentado','3×3 voltas']];
-const pv=(id,t,L)=>({t,g:'pre',u:L.map((x,i)=>({id:id+i,k:'c',m:1,l:x[0]+' · '+x[1]}))});
-const iv=(a,b,n)=>({a,b,n}),co=c=>({c});
-const RUN=[0,
-[iv(1,1,14),iv(2,1,10),iv(3,1,7)],[iv(1,1,15),iv(2,1,11),iv(3,1,8)],[iv(1,1,16),iv(2,1,12),iv(3,1,9)],[iv(1,1,14),iv(2,1,10),iv(3,1,7)],
-[iv(4,2,5),iv(4,1,6),co(20)],[iv(4,2,6),iv(4,1,7),co(22)],[iv(4,2,7),iv(4,1,8),co(24)],[iv(4,2,5),iv(4,1,6),co(20)],
-[iv(5,1,6),iv(6,1,6),co(22)],[iv(5,1,7),iv(6,1,7),co(24)],[iv(5,1,8),iv(6,1,8),co(26)],[iv(5,1,6),null,{race:1}]];
-const PH=['','Base','Consolidação','Alvo'],ph=w=>w<5?1:w<9?2:3;
+const PH=['','Base','Consolidação','Alvo','Rumo aos 10 km'],ph=w=>w<5?1:w<9?2:w<13?3:4;
 const DN=['Segunda','Terça','Quarta','Quinta','Sexta','Sábado','Domingo'];
-const HN=['Abdominal crunch','Elevação de pernas c/ joelho flexionado','Abdominal remador','Prancha abdominal'];
-
-function strS(w,id,t,blocks,warm){const r=RP[w];return{t,g:'str',u:[{id:id+'w',k:'c',m:1,l:warm},...blocks.map((b,i)=>({id:id+i,k:'s',m:3,ty:T[b[0]],n:b.slice(1),r}))]}}
+const SR=w=>[12,13,17,21,23,24].includes(w)?{m:2,r:'10–12'}:w<5?{m:2,r:'12–15'}:w<9?{m:3,r:'10–12'}:{m:3,r:'8–12'};
+const INF=[[['Leg press 45']],[['Agachamento hack']],[['Cadeira extensora']],[['Passada com halteres (cada perna)']],[['Panturrilha em pé']],[['Flexão tibial anterior com miniband'],{m:2,r:'15'}]];
+const SUP=[[['Supino com halteres ou na máquina']],[['Remada baixa']],[['Puxada alta']],[['Desenvolvimento com halteres']],[['Elevação lateral']],[['Rosca martelo','Tríceps na corda']],[['Prancha'],{m:3,r:'20–30 s'}]];
+const GLP=[[['Elevação pélvica (comece leve)']],[['Stiff com halteres (comece leve)']],[['Agachamento sumô ou búlgaro']],[['Mesa flexora']],[['Glúteo na polia (coice)']],[['Abdutora']],[['Panturrilha sentada']]];
+const PRET='Antes de correr · mobilidade (5 min)',POST='Depois de correr · fortalecimento da canela';
+const PRE=[['Mobilidade de tornozelo na parede','2×20 por perna'],['Círculo de quadril (standing hip CARS)','2×5 voltas por perna'],['Flexão plantar e dorsal (elástico ou solo)','2×20 cada'],['Alongamento dinâmico do flexor do quadril','2×20 por perna']];
+const POS=[['Marcha com calcanhar (tibial walks)','3×20 passos por perna'],['Flexão tibial anterior com miniband','3×15 por perna'],['Elevação de panturrilha unilateral','3×15 por perna'],['Tibial posterior: inversão sentado com miniband','3×15 por perna'],['Tibial posterior: eversão sentado com miniband','3×3 voltas']];
+const pv=(id,t,L)=>({t,g:'pre',u:L.map((x,i)=>({id:id+i,k:'c',m:1,l:x[0]+' · '+x[1]}))});
+const fm=x=>x===1.5?'1 min 30 s':x+' min';
+const TI='Treino de tiro',RO='Rodagem leve',LG='Longão';
+const ti=(a,n)=>({t:'cl',p:TI,a,b:2,n,tiro:1}),ro=(a,b,n)=>({t:'cl',p:RO,a,b,n}),lg=(a,b,n)=>({t:'cl',p:LG,a,b,n});
+const fa=m=>({t:'fa',m}),pg=(a,n)=>({t:'pg',a,n}),rc=c=>({t:'co',p:RO,c}),lc=c=>({t:'co',p:LG,c}),lb=(...L)=>({t:'bl',p:LG,L,gap:1});
+const km=n=>({t:'km',n}),tp=m=>({t:'tp',m});
+const RUN=[0,
+[ti(1,6),ro(2,2,5),lg(2,1,8)],
+[ti(1,6),ro(2,2,5),lg(2,1,8)],
+[fa(20),ro(3,2,4),lg(3,1,7)],
+[ti(1,4),ro(2,2,4),lg(3,1,5)],
+[ti(2,5),ro(4,2,4),lg(5,1,5)],
+[fa(25),ro(5,2,4),lg(6,1,5)],
+[ti(3,4),ro(6,2,3),lg(8,1,4)],
+[fa(20),ro(4,2,3),lg(6,1,4)],
+[pg(4,3),ro(8,2,3),lg(10,1,3)],
+[ti(3,5),ro(12,2,2),lb(15,15)],
+[fa(30),rc(20),lc(28)],
+[rc(15),rc(10),{t:'race'}],
+[fa(20),rc(20),km(4)],
+[ti(2,6),rc(25),km(5)],
+[fa(30),rc(30),km(6)],
+[tp(15),rc(30),km(7)],
+[ti(2,4),rc(25),km(5)],
+[fa(35),rc(35),km(7)],
+[ti(3,5),rc(35),km(8)],
+[tp(20),rc(40),km(9)],
+[fa(25),rc(30),km(6)],
+[pg(8,3),rc(40),km(9)],
+[ti(2,4),rc(25),km(7)],
+[rc(20),rc(15),{t:'race10'}]];
+const EXA=['Dead bug','Prancha','Crunch','Prancha lateral (alterne o lado a cada rodada)'];
+const abc=w=>w<5?{n:2,d:30,r:30}:w<9?{n:3,d:30,r:20}:{n:3,d:40,r:20};
+function strS(w,id,t,L,warm){const q=SR(w);return{t,g:'str',sid:id,alt:1,nt:'Termine cada série sentindo que faria mais 2 ou 3 repetições.',u:[{id:id+'w',k:'c',m:1,l:warm},...L.map((b,i)=>{const o=b[1]||q;return{id:id+i,k:'s',m:o.m,ty:b[0].length>1?'Bi-set':'',n:b[0],r:o.r}})]}}
 function runS(w,x,id){
- const wu={id:id+'a',k:'c',m:1,l:'Aquecimento: 5 min em Z1 (50–59% FCmáx)'},cd={id:id+'z',k:'c',m:1,l:'Desaquecimento: 5 min em Z1'};
- if(x.race)return{t:'Dia de prova · 5 km',g:'run',u:[wu,{id:id+'m',k:'c',m:1,l:'5 km em Z4 (80–89% FCmáx)'},cd]};
- if(x.c)return{t:'Contínuo '+x.c+' min · moderado',g:'run',u:[wu,{id:id+'m',k:'c',m:1,z:x.c,l:x.c+' min contínuos em Z3 (70–79% FCmáx)'},cd]};
- return{t:'Intervalado '+x.a+':'+x.b+' · moderado',g:'run',u:[wu,{id:id+'m',k:'n',m:x.n,z:x.a,l:x.n+' tiros: '+x.a+' min Z3 + '+x.b+' min Z1'},cd]};
+ const M=(k,l,m,z)=>({id:id+'m'+k,k:m>1?'n':'c',m,z,l});
+ const blocks=(L,gap,txt)=>L.map((a,i)=>M(i,'Bloco '+(i+1)+': corra '+a+' min'+(txt||'')+(i<L.length-1?' e caminhe '+gap+' min':''),1,a));
+ let t,u,hard=0;
+ if(x.t==='race'){t='Dia de prova · 5 km';u=[M('','5 km contínuos, no seu ritmo',1,0)]}
+ else if(x.t==='race10'){t='Dia de prova · 10 km';u=[M('','10 km contínuos, no seu ritmo (se precisar, caminhe 1 min nos postos de água)',1,0)]}
+ else if(x.t==='km'){t='Longão · '+x.n+' km';u=[M('',x.n+' km contínuos em ritmo leve (se precisar, caminhe 1 min a cada 10 a 12 min)',1,Math.round(x.n*7.5))]}
+ else if(x.t==='tp'){t='Treino de ritmo · '+x.m+' min';hard=1;u=[M('',x.m+' min contínuos em esforço 6 de 10, ritmo constante (dá para falar frases curtas)',1,x.m)]}
+ else if(x.t==='co'){t=(x.p||'Contínuo')+' · '+x.c+' min';u=[M('',x.c+' min contínuos em ritmo bem leve',1,x.c)]}
+ else if(x.t==='cl'){t=x.p+' · '+x.n+' × '+fm(x.a);hard=x.tiro;u=[M('',x.tiro?x.n+' tiros: '+fm(x.a)+' em esforço forte + '+fm(x.b)+' caminhando':x.n+' vezes: corre '+fm(x.a)+' em ritmo leve + caminha '+fm(x.b),x.n,x.a)]}
+ else if(x.t==='fa'){t='Fartlek · '+x.m+' min';hard=1;u=[M('',x.m+' min: alterne, por sensação, trechos de 1 a 2 min mais fortes com 2 a 3 min leves (trote ou caminhada)',1,Math.round(x.m*.5))]}
+ else if(x.t==='pg'){t='Progressivo · '+x.n+' × '+x.a+' min';hard=1;u=blocks(Array(x.n).fill(x.a),2,', um pouco mais rápido que o anterior')}
+ else{t=x.p+' · blocos '+x.L.join(' + ')+' min';u=blocks(x.L,x.gap||2)}
+ const nt=hard?'Trechos fortes: esforço 6 de 10 (dá para falar poucas palavras). O resto em ritmo de conversa. Na esteira: leve ~7,5–8 km/h, forte ~8,5–9, caminhada ~5,5–6.':'Ritmo de conversa (Z1 a Z2). Na esteira: corrida ~7,5–8 km/h, caminhada ~5,5–6.';
+ return{t,g:'run',nt,u:[{id:id+'a',k:'c',m:1,l:'Aquecimento: 5 min de caminhada rápida'},...u,{id:id+'z',k:'c',m:1,l:'Desaquecimento: 5 min de caminhada'}]}
 }
-function hiit(w,id){const n=w<7?2:3;return{t:'Treino C · HIIT abdominal',g:'abs',h:1,u:Array.from({length:n},(_,i)=>({id:id+'r'+i,k:'c',m:1,l:'Rodada '+(i+1)+' de '+n+' (8 × 20 s)'}))}}
+function core(w,id){const c=abc(w);return{t:'Core · abdômen',g:'abs',h:1,hw:w,hd:c.d,hr:c.r,u:Array.from({length:c.n},(_,i)=>({id:id+'r'+i,k:'c',m:1,l:'Rodada '+(i+1)+' de '+c.n}))}}
 function week(w){
- const p=ph(w),r=RUN[w],id=(d,s)=>w+'-'+d+'-'+s+'-';
- const RD=(w,x,d,f=1)=>[pv(id(d,2),PRET,PRE),runS(w,x,id(d,0)),...(f?[pv(id(d,3),POST,POS)]:[])];
- const up='Aquecimento e mobilidade de superiores',lw='Mobilidade inferiores + 3×15 agachamento com peso do corpo';
- const Bb=B[p].map(b=>b.slice());if(w===5)Bb[3][0]='d';
- const B_=()=>strS(w,id(2,0),'Treino B · Membros inferiores',Bb,lw),A_=()=>strS(w,id(0,0),'Treino A · Superiores completo',A[p],up),D_=()=>strS(w,id(4,0),'Treino D · Membros inferiores',D[p],lw),H=[...RD(w,r[0],1,0),A_(),hiit(w,id(1,1))];
- if(w===12)return[[D_()],H,[],[B_()],[],[],RD(w,r[2],6)];
- return[[B_()],H,[],RD(w,r[1],3),[D_()],RD(w,r[2],5),[]];
+ const r=RUN[w],id=(d,s)=>'n'+w+'-'+d+'-'+s+'-';
+ const RD=(x,d,f,p=1)=>[...(p?[pv(id(d,2),PRET,PRE)]:[]),runS(w,x,id(d,0)),...(f?[pv(id(d,3),POST,POS)]:[])];
+ const aw='Aquecimento: 5 min de caminhada ou bicicleta + 1 série leve do primeiro exercício';
+ const X=x=>S.alt&&S.alt[x.sid]?{t:'Aula de funcional ou luta (no lugar de '+x.t.replace('Treino · ','').toLowerCase()+')',g:'abs',sid:x.sid,alt:1,u:[{id:x.sid+'f',k:'c',m:1,l:'Aula feita (funcional, luta ou outra)'}]}:x;
+ const I_=()=>X(strS(w,id(0,0),'Treino · Inferiores',INF,aw)),S_=()=>X(strS(w,id(2,0),'Treino · Superiores',SUP,aw)),G_=()=>X(strS(w,id(3,4),'Treino · Glúteo e posterior',GLP,aw));
+ const P_=()=>({t:'Aula de pilates',g:'pre',u:[{id:id(5,5)+'p',k:'c',m:1,l:'Pilates (aula da academia)'}]});
+ const T1=[...RD(r[0],1,0),core(w,id(1,1))];
+ if(w===12||w===24)return[[I_()],T1,[S_()],RD(r[1],3,0),[],RD(r[2],5,0),[]];
+ return[[I_()],T1,[S_()],[...RD(r[1],3,1),G_()],[],[P_(),...RD(r[2],5,1,0)],[]];
 }
 let S={d:{},k:{},st:''};
 try{Object.assign(S,JSON.parse(localStorage.getItem('th2o')||'{}'))}catch(e){}
 Object.keys(S.k).forEach(k=>{if(!k.includes(':')){S.k[k+':0']=S.k[k];delete S.k[k]}});
-S.n=S.n||{};S.di=S.di||{};
+S.n=S.n||{};S.di=S.di||{};S.alt=S.alt||{};
 const esc=t=>String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;');
 const save=()=>{try{localStorage.setItem('th2o',JSON.stringify(S))}catch(e){}};
 const $=s=>document.querySelector(s);
 function tally(sess){let t=0,d=0;sess.forEach(s=>s.u.forEach(u=>{t+=u.m;d+=Math.min(S.d[u.id]||0,u.m)}));return[d,t]}
-function pos(){if(!S.st)return null;const i=Math.floor((new Date().setHours(0,0,0,0)-new Date(S.st+'T00:00:00'))/864e5);return i>=0&&i<84?{w:Math.floor(i/7)+1,d:i%7}:null}
-let cur=(pos()||{w:1}).w;
+function pos(){if(!S.st)return null;const i=Math.floor((new Date().setHours(0,0,0,0)-new Date(S.st+'T00:00:00'))/864e5);return i>=0&&i<161?{w:Math.floor(i/7)+2,d:i%7}:null}
+let cur=(pos()||{w:2}).w;
 function uh(u){
  const v=S.d[u.id]||0;
  if(u.k==='c')return`<label class="u"><input type="checkbox" data-i="${u.id}" ${v?'checked':''}><span class="nm">${u.l}</span></label>`;
  if(u.k==='n')return`<div class="u"><div class="nm"><b>${u.l}</b></div><div class="cnt"><button aria-label="menos" data-c="${u.id}" data-dx="-1" data-m="${u.m}">−</button><span>${v}/${u.m}</span><button aria-label="mais" data-c="${u.id}" data-dx="1" data-m="${u.m}">+</button></div></div>`;
- return`<div class="u"><div class="nm"><b>${u.n.join(' + ')}</b><small>${u.ty} · 3×${u.r}</small></div><div class="dots">${[1,2,3].map(j=>`<button class="dot ${v>=j?'on':''}" aria-label="série ${j}" data-s="${u.id}" data-j="${j}">${j}</button>`).join('')}</div><div class="kgs">${u.n.map((x,i)=>`<input class="kg" inputmode="decimal" placeholder="kg" aria-label="carga em kg: ${x}" data-k="${u.id}:${i}" value="${S.k[u.id+':'+i]||''}">`).join('')}</div></div>`;
+ return`<div class="u"><div class="nm"><b>${u.n.join(' + ')}</b><small>${u.ty?u.ty+' · ':''}${u.m}×${u.r}</small></div><div class="dots">${Array.from({length:u.m},(_,i)=>i+1).map(j=>`<button class="dot ${v>=j?'on':''}" aria-label="série ${j}" data-s="${u.id}" data-j="${j}">${j}</button>`).join('')}</div><div class="kgs">${u.n.map((x,i)=>`<input class="kg" inputmode="decimal" placeholder="kg" aria-label="carga em kg: ${x}" data-k="${u.id}:${i}" value="${S.k[u.id+':'+i]||''}">`).join('')}</div></div>`;
 }
 let view='w',ex='';
 const nk=n=>n.replace(' (cada perna)','');
-function loads(){const m={};for(let w=1;w<=12;w++)week(w).flat().forEach(s=>s.u.forEach(u=>{if(u.k!=='s')return;u.n.forEach((nm,i)=>{nm=nk(nm);const v=parseFloat(String(S.k[u.id+':'+i]||'').replace(',','.'));if(v>0){m[nm]=m[nm]||{};m[nm][w]=Math.max(m[nm][w]||0,v)}})}));return m}
+function loads(){const m={};for(let w=2;w<=24;w++)week(w).flat().forEach(s=>s.u.forEach(u=>{if(u.k!=='s')return;u.n.forEach((nm,i)=>{nm=nk(nm);const v=parseFloat(String(S.k[u.id+':'+i]||'').replace(',','.'));if(v>0){m[nm]=m[nm]||{};m[nm][w]=Math.max(m[nm][w]||0,v)}})}));return m}
 function evoS(){
  const m=loads(),ns=Object.keys(m).sort((a,b)=>a.localeCompare(b,'pt'));
  if(!ns.length)return'<h2>Evolução das cargas</h2><div class="rest">Anote a carga (kg) em cada exercício de musculação e o gráfico aparece aqui.</div>';
  if(!m[ex])ex=ns[0];
- const d=m[ex],ws=Object.keys(d).map(Number).sort((a,b)=>a-b),mx=Math.max(...ws.map(w=>d[w]))*1.15,X=w=>44+(w-1)*52,Y=v=>220-v/mx*190;
- let g='';for(let i=0;i<=4;i++){const v=mx*i/4;g+=`<line x1="40" x2="620" y1="${Y(v)}" y2="${Y(v)}" stroke="var(--line)"/><text x="34" y="${Y(v)+4}" text-anchor="end" font-size="11" fill="var(--mut)">${Math.round(v*10)/10}</text>`}
- for(let w=1;w<=12;w++)g+=`<text x="${X(w)}" y="244" text-anchor="middle" font-size="11" fill="var(--mut)">S${w}</text>`;
+ const d=m[ex],ws=Object.keys(d).map(Number).sort((a,b)=>a-b),mx=Math.max(...ws.map(w=>d[w]))*1.15,X=w=>44+(w-2)*52,Y=v=>220-v/mx*190;
+ let g='';for(let i=0;i<=4;i++){const v=mx*i/4;g+=`<line x1="40" x2="1240" y1="${Y(v)}" y2="${Y(v)}" stroke="var(--line)"/><text x="34" y="${Y(v)+4}" text-anchor="end" font-size="11" fill="var(--mut)">${Math.round(v*10)/10}</text>`}
+ for(let w=2;w<=24;w++)g+=`<text x="${X(w)}" y="244" text-anchor="middle" font-size="11" fill="var(--mut)">S${w}</text>`;
  g+=`<polyline fill="none" stroke="var(--run)" stroke-width="3" points="${ws.map(w=>X(w)+','+Y(d[w])).join(' ')}"/>`+ws.map(w=>`<circle cx="${X(w)}" cy="${Y(d[w])}" r="5" fill="var(--run)"/><text x="${X(w)}" y="${Y(d[w])-10}" text-anchor="middle" font-size="12" font-weight="600" fill="var(--ink)">${d[w]}</text>`).join('');
- let h=`<h2>Evolução das cargas</h2><div class="sub">Maior carga anotada por semana, em kg</div><select id="ex" aria-label="Exercício">${ns.map(n=>`<option ${n===ex?'selected':''}>${n}</option>`).join('')}</select><svg class="ch" viewBox="0 0 640 256" role="img" aria-label="Evolução de ${ex}">${g}</svg><div class="day"><div class="dh"><span>Todos os exercícios</span><small>primeira → última carga</small></div>`;
+ let h=`<h2>Evolução das cargas</h2><div class="sub">Maior carga anotada por semana, em kg</div><select id="ex" aria-label="Exercício">${ns.map(n=>`<option ${n===ex?'selected':''}>${n}</option>`).join('')}</select><div style="overflow-x:auto"><svg class="ch" style="min-width:1260px" viewBox="0 0 1260 256" role="img" aria-label="Evolução de ${ex}">${g}</svg></div><div class="day"><div class="dh"><span>Todos os exercícios</span><small>primeira → última carga</small></div>`;
  ns.forEach(n=>{const q=Object.keys(m[n]).map(Number).sort((a,b)=>a-b),a=m[n][q[0]],z=m[n][q[q.length-1]],df=Math.round((z-a)*10)/10;h+=`<div class="u"><span class="nm"><b>${n}</b></span><span class="dl">${a} → ${z} kg <span style="color:${df>0?'var(--ok)':'var(--mut)'}">${df>0?'+':''}${df}</span></span></div>`});
  return h+'</div>';
 }
 function runC(){
  const P=[],Dn=[];
- for(let w=1;w<=12;w++){let p=0,d=0;week(w).flat().forEach(s=>s.u.forEach(u=>{if(!u.z)return;const v=S.d[u.id]||0;if(u.k==='n'){p+=u.m*u.z;d+=Math.min(v,u.m)*u.z}else{p+=u.z;d+=v?u.z:0}}));P.push(p);Dn.push(d)}
- const mx=Math.max(...P)*1.1,Y=v=>200-v/mx*170,X=w=>44+(w-1)*52;let g='';
- for(let i=0;i<=4;i++){const v=mx*i/4;g+=`<line x1="40" x2="620" y1="${Y(v)}" y2="${Y(v)}" stroke="var(--line)"/><text x="34" y="${Y(v)+4}" text-anchor="end" font-size="11" fill="var(--mut)">${Math.round(v)}</text>`}
- for(let w=1;w<=12;w++){const i=w-1;g+=`<rect x="${X(w)-14}" y="${Y(P[i])}" width="13" height="${200-Y(P[i])}" rx="2" fill="var(--abs)"/><rect x="${X(w)+1}" y="${Y(Dn[i])}" width="13" height="${200-Y(Dn[i])}" rx="2" fill="var(--run)"/>`+(Dn[i]?`<text x="${X(w)+7}" y="${Y(Dn[i])-4}" text-anchor="middle" font-size="11" font-weight="600" fill="var(--ink)">${Dn[i]}</text>`:'')+`<text x="${X(w)}" y="220" text-anchor="middle" font-size="11" fill="var(--mut)">S${w}</text>`}
+ for(let w=2;w<=24;w++){let p=0,d=0;week(w).flat().forEach(s=>s.u.forEach(u=>{if(!u.z)return;const v=S.d[u.id]||0;if(u.k==='n'){p+=u.m*u.z;d+=Math.min(v,u.m)*u.z}else{p+=u.z;d+=v?u.z:0}}));P.push(p);Dn.push(d)}
+ const mx=Math.max(...P)*1.1,Y=v=>200-v/mx*170,X=w=>44+(w-2)*52;let g='';
+ for(let i=0;i<=4;i++){const v=mx*i/4;g+=`<line x1="40" x2="1240" y1="${Y(v)}" y2="${Y(v)}" stroke="var(--line)"/><text x="34" y="${Y(v)+4}" text-anchor="end" font-size="11" fill="var(--mut)">${Math.round(v)}</text>`}
+ for(let w=2;w<=24;w++){const i=w-2;g+=`<rect x="${X(w)-14}" y="${Y(P[i])}" width="13" height="${200-Y(P[i])}" rx="2" fill="var(--abs)"/><rect x="${X(w)+1}" y="${Y(Dn[i])}" width="13" height="${200-Y(Dn[i])}" rx="2" fill="var(--run)"/>`+(Dn[i]?`<text x="${X(w)+7}" y="${Y(Dn[i])-4}" text-anchor="middle" font-size="11" font-weight="600" fill="var(--ink)">${Dn[i]}</text>`:'')+`<text x="${X(w)}" y="220" text-anchor="middle" font-size="11" fill="var(--mut)">S${w}</text>`}
  g+=`<rect x="44" y="4" width="10" height="10" fill="var(--abs)"/><text x="58" y="13" font-size="11" fill="var(--mut)">planejado</text><rect x="130" y="4" width="10" height="10" fill="var(--run)"/><text x="144" y="13" font-size="11" fill="var(--mut)">feito</text>`;
  const tp=P.reduce((a,b)=>a+b,0),td=Dn.reduce((a,b)=>a+b,0);
- return`<div class="day"><div class="dh"><span>Corrida · minutos em ritmo moderado (Z3)</span><small>${td} de ${tp} min</small></div><svg class="ch" viewBox="0 0 640 230" role="img" aria-label="Minutos em Z3 por semana, feito e planejado">${g}</svg><div class="note">Soma os tiros em Z3 e os minutos contínuos de cada semana. A prova de 5 km da semana 12 fica de fora.</div></div>`}
+ return`<div class="day"><div class="dh"><span>Corrida · minutos correndo (estimado)</span><small>${td} de ${tp} min</small></div><div style="overflow-x:auto"><svg class="ch" style="min-width:1260px" viewBox="0 0 1260 230" role="img" aria-label="Minutos correndo por semana, feito e planejado">${g}</svg></div><div class="note">Soma os minutos de corrida de cada semana (sem contar a caminhada). A prova de 5 km fica de fora.</div></div>`}
 function evo(){return evoS()+runC()}
 const AL='Salada e legumes à vontade, inclua pelo menos 2 opções (temperar com vinagre, limão, azeite extravirgem)';
 const PR='Carne magra ou Frango (peito ou filé) ou Peixe (tilápia, merluza, salmão, saint peter) (1 filé médio ~120g) ou Omelete com queijo (150g). Preparo: cozido, grelhado ou assado.';
@@ -174,7 +201,7 @@ function dieta(){
 }
 function csv(){
  const q=v=>'"'+String(v).replace(/"/g,'""')+'"',R=[['semana','dia','sessão','item','feito','carga_kg','anotação'].map(q).join(';')];
- for(let w=1;w<=12;w++)week(w).forEach((ss,d)=>ss.forEach(s=>{
+ for(let w=2;w<=24;w++)week(w).forEach((ss,d)=>ss.forEach(s=>{
   s.u.forEach(u=>{const f=Math.min(S.d[u.id]||0,u.m);
    if(u.k==='s')u.n.forEach((nm,i)=>{const kg=S.k[u.id+':'+i]||'';if(f||kg)R.push([w,DN[d],s.t,nm,f+'/'+u.m,kg,''].map(q).join(';'))});
    else if(f)R.push([w,DN[d],s.t,u.l,f+'/'+u.m,'',''].map(q).join(';'))});
@@ -189,20 +216,20 @@ function csv(){
 function exp(){return`<h2>Exportar histórico</h2><div class="sub">Copie o texto e cole numa planilha ou nas suas notas. Os campos são separados por ponto e vírgula.</div><textarea class="nt" id="cv" rows="12" readonly>${esc(csv())}</textarea><button class="go" data-cp>Copiar histórico</button><div id="cpm" class="note" role="status"></div>`}
 function render(){
  const w=cur,wk=week(w),tp=pos();
- let all=0,dn=0;for(let i=1;i<=12;i++){const [a,b]=tally(week(i).flat());dn+=a;all+=b}
+ let all=0,dn=0;for(let i=2;i<=24;i++){const [a,b]=tally(week(i).flat());dn+=a;all+=b}
  $('#pb').style.width=(100*dn/all)+'%';$('#pt').textContent=Math.round(100*dn/all)+'% do plano concluído';
  $('#st').value=S.st||'';
- $('#tabs').innerHTML=Array.from({length:12},(_,i)=>{const [a,b]=tally(week(i+1).flat());return`<button class="${i+1===w&&view==='w'?'on':''} ${a===b?'fin':''}" data-w="${i+1}" aria-label="Semana ${i+1}">${i+1}</button>`}).join('')+`<button class="${view==='e'?'on':''}" data-e="1" style="padding:0 14px">Evolução</button><button class="${view==='d'?'on':''}" data-d="1" style="padding:0 14px">Dieta</button><button class="${view==='x'?'on':''}" data-x="1" style="padding:0 14px">Exportar</button>`;
+ $('#tabs').innerHTML=Array.from({length:23},(_,i)=>{const [a,b]=tally(week(i+2).flat());return`<button class="${i+2===w&&view==='w'?'on':''} ${a===b?'fin':''}" data-w="${i+2}" aria-label="Semana ${i+2}">${i+2}</button>`}).join('')+`<button class="${view==='e'?'on':''}" data-e="1" style="padding:0 14px">Evolução</button><button class="${view==='d'?'on':''}" data-d="1" style="padding:0 14px">Dieta</button><button class="${view==='x'?'on':''}" data-x="1" style="padding:0 14px">Exportar</button>`;
  if(view!=='w'){$('#main').innerHTML=view==='e'?evo():view==='x'?exp():dieta();return}
  const [wa,wt]=tally(wk.flat());
  let h=`<h2>Semana ${w} · ${PH[ph(w)]}</h2><div class="sub">${Math.round(100*wa/wt)}% da semana</div>`;
  wk.forEach((ss,d)=>{
   const [a,b]=tally(ss),isT=tp&&tp.w===w&&tp.d===d;
-  const nm=DN[d]+(w===12&&d===6?' · prova':'');
+  const nm=DN[d]+((w===12||w===24)&&d===5?' · prova':'');
   h+=`<section class="day ${isT?'hoje':''} ${b&&a===b?'ok':''}"><div class="dh"><span>${nm}</span><small>${b?(a===b?'feito':a+'/'+b):''}</small></div>`;
   if(!ss.length)h+='<div class="rest">Descanso</div>';
-  ss.forEach(s=>{h+=`<div class="c ${s.g}"><h3>${s.t}</h3>`;
-   if(s.h)h+=`<ol class="stp">${[0,1].flatMap(()=>HN).map(x=>`<li>20 s · ${x}</li>`).join('')}</ol><button class="go" data-hiit>Iniciar cronômetro da rodada</button>`;
+  ss.forEach(s=>{h+=`<div class="c ${s.g}"><h3>${s.t}</h3>${s.nt?`<div class="note" style="margin:0 0 4px">${s.nt}</div>`:''}${s.alt?`<button class="bt" data-alt="${s.sid}">${S.alt[s.sid]?'Voltar para a musculação':'Fazer aula de funcional ou luta no lugar'}</button>`:''}`;
+   if(s.h)h+=`<ol class="stp">${EXA.map(x=>`<li>${s.hd} s · ${x}</li>`).join('')}</ol><div class="note" style="margin:0">${s.hr} s de descanso entre os exercícios</div><button class="go" data-hiit="${s.hw}">Iniciar cronômetro</button>`;
    h+=s.u.map(uh).join('')+`<textarea class="nt" rows="2" data-n="${s.u[0].id}" placeholder="Como foi? Cansaço, dor, observações" aria-label="Anotação do treino">${esc(S.n[s.u[0].id]||'')}</textarea></div>`});
   h+='</section>';
  });
@@ -210,7 +237,8 @@ function render(){
 }
 document.addEventListener('click',e=>{
  const t=e.target.closest('button');if(!t)return;
- if(t.dataset.d){view='d';render();scrollTo(0,0)}
+ if(t.dataset.alt){const k=t.dataset.alt;S.alt[k]=S.alt[k]?0:1;save();render()}
+ else if(t.dataset.d){view='d';render();scrollTo(0,0)}
  else if(t.dataset.dd!==undefined){const x=+t.dataset.dd,d=x?new Date(dd+'T00:00:00'):new Date();if(x)d.setDate(d.getDate()+x);dd=iso(d);render()}
  else if(t.dataset.wt){const D=gd();D.w=Math.max(0,(D.w||0)+ +t.dataset.wt);save();render()}
  else if(t.dataset.e){view='e';render();scrollTo(0,0)}
@@ -219,9 +247,9 @@ document.addEventListener('click',e=>{
  else if(t.dataset.s){const id=t.dataset.s,j=+t.dataset.j;S.d[id]=S.d[id]===j?j-1:j;save();render()}
  else if(t.dataset.c){const id=t.dataset.c,m=+t.dataset.m;S.d[id]=Math.max(0,Math.min(m,(S.d[id]||0)+ +t.dataset.dx));save();render()}
  else if('cp' in t.dataset){const a=$('#cv');a.select();let ok=false;try{ok=document.execCommand('copy')}catch(e){}try{navigator.clipboard.writeText(a.value);ok=true}catch(e){}$('#cpm').textContent=ok?'Copiado!':'Não consegui copiar sozinha. O texto está selecionado, use o copiar do seu aparelho.'}
- else if('hiit' in t.dataset)startT();
+ else if('hiit' in t.dataset)startT(+t.dataset.hiit);
  else if(t.id==='tx')stopT();
- else if(t.id==='rs'){if(t.dataset.a){S.d={};S.k={};S.n={};S.di={};save();t.textContent='Limpar progresso';delete t.dataset.a;render()}else{t.dataset.a=1;t.textContent='Toque de novo para confirmar';setTimeout(()=>{delete t.dataset.a;t.textContent='Limpar progresso'},4000)}}
+ else if(t.id==='rs'){if(t.dataset.a){S.d={};S.k={};S.n={};S.di={};S.alt={};save();t.textContent='Limpar progresso';delete t.dataset.a;render()}else{t.dataset.a=1;t.textContent='Toque de novo para confirmar';setTimeout(()=>{delete t.dataset.a;t.textContent='Limpar progresso'},4000)}}
 });
 document.addEventListener('change',e=>{
  if(e.target.dataset.i){S.d[e.target.dataset.i]=e.target.checked?1:0;save();render()}
@@ -236,11 +264,13 @@ document.addEventListener('input',e=>{if(e.target.dataset.k){S.k[e.target.datase
 let tm=null,ac=null;
 function beep(){try{ac=ac||new AudioContext();const o=ac.createOscillator();o.connect(ac.destination);o.frequency.value=880;o.start();o.stop(ac.currentTime+.2)}catch(e){}try{navigator.vibrate&&navigator.vibrate(200)}catch(e){}}
 function stopT(){clearInterval(tm);tm=null;$('#tp').hidden=true}
-function startT(){
- if(tm)return;const L=[...HN,...HN];let s=0,t=20;
- const show=()=>{$('#tt').textContent=(s+1)+'/8 · '+L[s]+' · '+t+'s'};
+function startT(w){
+ if(tm)return;const c=abc(w),seq=[];
+ for(let r=1;r<=c.n;r++)EXA.forEach((x,i)=>{seq.push([r,x.split(' (')[0],c.d]);if(!(r===c.n&&i===EXA.length-1))seq.push([r,'Descanso',c.r])});
+ let k=0,t=seq[0][2];
+ const show=()=>{$('#tt').textContent='R'+seq[k][0]+'/'+c.n+' · '+seq[k][1]+' · '+t+'s'};
  $('#tp').hidden=false;beep();show();
- tm=setInterval(()=>{t--;if(t<=0){s++;beep();if(s>=8){stopT();return}t=20}show()},1000);
+ tm=setInterval(()=>{t--;if(t<=0){k++;if(k>=seq.length){stopT();return}beep();t=seq[k][2]}show()},1000);
 }
 render();
 </script></body></html>
