@@ -59,7 +59,7 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-vis
 <label class="st">Início da semana 2 (segunda): <input type="date" id="st"></label>
 <nav id="tabs" aria-label="Semanas"></nav>
 <main id="main"></main>
-<p class="note">Segunda inferiores, terça corrida de qualidade (tiro, fartlek, ritmo ou progressivo) + core, quarta superiores, quinta rodagem leve + glúteo e posterior, sexta descanso, sábado pilates + longão, domingo descanso. Semana 12: prova ou teste de 5 km. Semana 24: prova de 10 km. Nas semanas leves (4, 8, 13, 17, 21 e 23) mantenha o ritmo mais tranquilo. Se uma semana ficar difícil, repita-a antes de avançar. É uma sugestão e não substitui a orientação de um profissional.</p>
+<p class="note">Segunda inferiores (quadríceps e glúteos), terça corrida leve + superiores A, quarta inferiores (posterior e glúteos), quinta superiores B + core + fortalecimento da canela, sexta descanso, sábado pilates + corrida (longão na maioria das semanas, tiro ou fartlek nas semanas leves), domingo descanso. Semana 12: prova ou teste de 5 km. Semana 24: prova de 10 km. Se uma semana ficar difícil, repita-a antes de avançar. É uma sugestão e não substitui a orientação de um profissional.</p>
 <div class="ft"><button id="rs">Limpar progresso</button></div>
 </div>
 <div id="tp" hidden><span id="tt"></span><button id="tx">Parar</button></div>
@@ -67,9 +67,10 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-vis
 const PH=['','Base','Consolidação','Alvo','Rumo aos 10 km'],ph=w=>w<5?1:w<9?2:w<13?3:4;
 const DN=['Segunda','Terça','Quarta','Quinta','Sexta','Sábado','Domingo'];
 const SR=w=>[12,13,17,21,23,24].includes(w)?{m:2,r:'10–12'}:w<5?{m:2,r:'12–15'}:w<9?{m:3,r:'10–12'}:{m:3,r:'8–12'};
-const INF=[[['Leg press 45']],[['Agachamento hack']],[['Cadeira extensora']],[['Passada com halteres (cada perna)']],[['Panturrilha em pé']],[['Flexão tibial anterior com miniband'],{m:2,r:'15'}]];
-const SUP=[[['Supino com halteres ou na máquina']],[['Remada baixa']],[['Puxada alta']],[['Desenvolvimento com halteres']],[['Elevação lateral']],[['Rosca martelo','Tríceps na corda']],[['Prancha'],{m:3,r:'20–30 s'}]];
-const GLP=[[['Elevação pélvica (comece leve)']],[['Stiff com halteres (comece leve)']],[['Agachamento sumô ou búlgaro']],[['Mesa flexora']],[['Glúteo na polia (coice)']],[['Abdutora']],[['Panturrilha sentada']]];
+const INF1=[[['Leg press 45']],[['Agachamento hack']],[['Cadeira extensora']],[['Passada com halteres (cada perna)']],[['Abdutora']],[['Panturrilha em pé']],[['Flexão tibial anterior com miniband'],{m:2,r:'15'}]];
+const INF2=[[['Stiff com halteres (comece leve)']],[['Elevação pélvica (comece leve)']],[['Mesa flexora']],[['Agachamento sumô ou búlgaro']],[['Glúteo na polia (coice)']],[['Panturrilha sentada']]];
+const SUPA=[[['Supino com halteres ou na máquina']],[['Remada baixa']],[['Desenvolvimento com halteres']],[['Elevação lateral']],[['Tríceps na corda']]];
+const SUPB=[[['Puxada alta']],[['Supino inclinado com halteres']],[['Remada unilateral com halter']],[['Face pull ou crucifixo inverso']],[['Rosca martelo']]];
 const PRET='Antes de correr · mobilidade (5 min)',POST='Depois de correr · fortalecimento da canela';
 const PRE=[['Mobilidade de tornozelo na parede','2×20 por perna'],['Círculo de quadril (standing hip CARS)','2×5 voltas por perna'],['Flexão plantar e dorsal (elástico ou solo)','2×20 cada'],['Alongamento dinâmico do flexor do quadril','2×20 por perna']];
 const POS=[['Marcha com calcanhar (tibial walks)','3×20 passos por perna'],['Flexão tibial anterior com miniband','3×15 por perna'],['Elevação de panturrilha unilateral','3×15 por perna'],['Tibial posterior: inversão sentado com miniband','3×15 por perna'],['Tibial posterior: eversão sentado com miniband','3×3 voltas']];
@@ -80,30 +81,30 @@ const ti=(a,n)=>({t:'cl',p:TI,a,b:2,n,tiro:1}),ro=(a,b,n)=>({t:'cl',p:RO,a,b,n})
 const fa=m=>({t:'fa',m}),pg=(a,n)=>({t:'pg',a,n}),rc=c=>({t:'co',p:RO,c}),lc=c=>({t:'co',p:LG,c}),lb=(...L)=>({t:'bl',p:LG,L,gap:1});
 const km=n=>({t:'km',n}),tp=m=>({t:'tp',m});
 const RUN=[0,
-[ti(1,6),ro(2,2,5),lg(2,1,8)],
-[ti(1,6),ro(2,2,5),lg(2,1,8)],
-[fa(20),ro(3,2,4),lg(3,1,7)],
-[ti(1,4),ro(2,2,4),lg(3,1,5)],
-[ti(2,5),ro(4,2,4),lg(5,1,5)],
-[fa(25),ro(5,2,4),lg(6,1,5)],
-[ti(3,4),ro(6,2,3),lg(8,1,4)],
-[fa(20),ro(4,2,3),lg(6,1,4)],
-[pg(4,3),ro(8,2,3),lg(10,1,3)],
-[ti(3,5),ro(12,2,2),lb(15,15)],
-[fa(30),rc(20),lc(28)],
-[rc(15),rc(10),{t:'race'}],
-[fa(20),rc(20),km(4)],
-[ti(2,6),rc(25),km(5)],
-[fa(30),rc(30),km(6)],
-[tp(15),rc(30),km(7)],
-[ti(2,4),rc(25),km(5)],
-[fa(35),rc(35),km(7)],
-[ti(3,5),rc(35),km(8)],
-[tp(20),rc(40),km(9)],
-[fa(25),rc(30),km(6)],
-[pg(8,3),rc(40),km(9)],
-[ti(2,4),rc(25),km(7)],
-[rc(20),rc(15),{t:'race10'}]];
+[ro(2,2,5),0,lg(2,1,8)],
+[ro(2,2,5),0,lg(2,1,8)],
+[ro(3,2,4),0,lg(3,1,7)],
+[ro(2,2,4),0,ti(1,4)],
+[ro(4,2,4),0,lg(5,1,5)],
+[ro(5,2,4),0,lg(6,1,5)],
+[ro(6,2,3),0,lg(8,1,4)],
+[ro(4,2,3),0,fa(20)],
+[ro(8,2,3),0,lg(10,1,3)],
+[ro(12,2,2),0,lb(15,15)],
+[rc(20),0,lc(28)],
+[rc(15),0,{t:'race'}],
+[rc(20),0,fa(20)],
+[rc(25),0,km(5)],
+[rc(30),0,km(6)],
+[rc(30),0,km(7)],
+[rc(25),0,ti(2,4)],
+[rc(35),0,km(7)],
+[rc(35),0,km(8)],
+[rc(40),0,km(9)],
+[rc(30),0,fa(25)],
+[rc(40),0,km(9)],
+[rc(25),0,ti(2,4)],
+[rc(20),0,{t:'race10'}]];
 const EXA=['Dead bug','Prancha','Crunch','Prancha lateral (alterne o lado a cada rodada)'];
 const abc=w=>w<5?{n:2,d:30,r:30}:w<9?{n:3,d:30,r:20}:{n:3,d:40,r:20};
 function strS(w,id,t,L,warm){const q=SR(w);return{t,g:'str',sid:id,alt:1,nt:'Termine cada série sentindo que faria mais 2 ou 3 repetições.',u:[{id:id+'w',k:'c',m:1,l:warm},...L.map((b,i)=>{const o=b[1]||q;return{id:id+i,k:'s',m:o.m,ty:b[0].length>1?'Bi-set':'',n:b[0],r:o.r}})]}}
@@ -125,15 +126,15 @@ function runS(w,x,id){
 }
 function core(w,id){const c=abc(w);return{t:'Core · abdômen',g:'abs',h:1,hw:w,hd:c.d,hr:c.r,u:Array.from({length:c.n},(_,i)=>({id:id+'r'+i,k:'c',m:1,l:'Rodada '+(i+1)+' de '+c.n}))}}
 function week(w){
- const r=RUN[w],id=(d,s)=>'n'+w+'-'+d+'-'+s+'-';
+ const r=RUN[w],id=(d,x)=>'m'+w+'-'+d+'-'+x+'-';
  const RD=(x,d,f,p=1)=>[...(p?[pv(id(d,2),PRET,PRE)]:[]),runS(w,x,id(d,0)),...(f?[pv(id(d,3),POST,POS)]:[])];
  const aw='Aquecimento: 5 min de caminhada ou bicicleta + 1 série leve do primeiro exercício';
  const X=x=>S.alt&&S.alt[x.sid]?{t:'Aula de funcional ou luta (no lugar de '+x.t.replace('Treino · ','').toLowerCase()+')',g:'abs',sid:x.sid,alt:1,u:[{id:x.sid+'f',k:'c',m:1,l:'Aula feita (funcional, luta ou outra)'}]}:x;
- const I_=()=>X(strS(w,id(0,0),'Treino · Inferiores',INF,aw)),S_=()=>X(strS(w,id(2,0),'Treino · Superiores',SUP,aw)),G_=()=>X(strS(w,id(3,4),'Treino · Glúteo e posterior',GLP,aw));
- const P_=()=>({t:'Aula de pilates',g:'pre',u:[{id:id(5,5)+'p',k:'c',m:1,l:'Pilates (aula da academia)'}]});
- const T1=[...RD(r[0],1,0),core(w,id(1,1))];
- if(w===12||w===24)return[[I_()],T1,[S_()],RD(r[1],3,0),[],RD(r[2],5,0),[]];
- return[[I_()],T1,[S_()],[...RD(r[1],3,1),G_()],[],[P_(),...RD(r[2],5,1,0)],[]];
+ const L1=()=>X(strS(w,id(0,0),'Treino · Inferiores (quadríceps e glúteos)',INF1,aw)),S1=()=>X(strS(w,id(1,4),'Treino · Superiores A',SUPA,aw)),L2=()=>X(strS(w,id(2,0),'Treino · Inferiores (posterior e glúteos)',INF2,aw)),S2=()=>X(strS(w,id(3,4),'Treino · Superiores B',SUPB,aw));
+ const P_=()=>({t:'Aula de pilates',g:'pre',u:[{id:id(5,5)+'p',k:'c',m:1,l:'Pilates leve (aula da academia)'}]});
+ const TUE=[...RD(r[0],1,0),S1()],THU=[S2(),core(w,id(3,1))];
+ if(w===12||w===24)return[[L1()],TUE,[L2()],THU,[],RD(r[2],5,0),[]];
+ return[[L1()],TUE,[L2()],[...THU,pv(id(3,3),'Fortalecimento da canela',POS)],[],[P_(),...RD(r[2],5,1,0)],[]];
 }
 let S={d:{},k:{},st:''};
 try{Object.assign(S,JSON.parse(localStorage.getItem('th2o')||'{}'))}catch(e){}
